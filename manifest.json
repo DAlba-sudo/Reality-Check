@@ -1,0 +1,20 @@
+{
+    "manifest_version": 3,
+    "name": "Reality-Check",
+    "description": "A lightweight extension engineered to detect malicious extensions attempting to covertly alter the content you consume.",
+    "version": "1.0",
+    "action": {
+        "default_popup": "./templates/popup.html"
+    },
+    "background": {
+        "service_worker": "./serv/sworker.js",
+        "type": "module"
+    },
+    "content_scripts": [{
+        "matches": ["*://*/*"],
+        "js": ["./cs/wgetter.js"]
+    }],
+    "permissions": [
+        
+    ]
+}
