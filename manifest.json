@@ -7,7 +7,7 @@
         "default_popup": "./templates/popup.html"
     },
     "background": {
-        "service_worker": "./serv/sworker.js",
+        "service_worker": "./serv/brain.js",
         "type": "module"
     },
     "content_scripts": [{
@@ -15,6 +15,6 @@
         "js": ["./cs/wgetter.js"]
     }],
     "permissions": [
-        
+        "webRequest"
     ]
 }

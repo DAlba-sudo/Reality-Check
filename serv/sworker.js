@@ -1,7 +1,4 @@
-let sandbox_waiting = []
-let sandbox_inprog = []
-let sandbox_completed = []
-
+foreign_hrefs = []
 let core = {
     pk: null,
     joblists: [],
@@ -19,31 +16,33 @@ async function post(url, data) {
     });
 }
 
-// register this endpoint as a consumer
-async function register() {
-    // contact the server
-    let response = post(`${core.host}register/consumer`, {});
-
-    // get our consumer pk
-    response.then((raw) => {return raw.json()})
-        .then((data) => {
-            console.log(`We received this pk: ${data['pk']}!`);
-            core.pk = data['pk'];
-        });
-    
-    
-    console.log("Finished the registration process.");
-}
-
+// we register a consumer 
 register();
 
+// we need to query the server that we have loaded a new page
+// and that we need the page's foreign hrefs...
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
     if (message.action == "store-url") {
         // we are asked to store a url for ingestion into the 
         // sandbox.
 
         console.log(`We have been asked to store: ${message.payload}`);
-        sandbox_waiting.push(message.payload);
+        let data = {
+            location: message.payload,
+        }
+        let response = post(`${core.host}${core.pk}/job`, data);
+        
+        // as a response we expect the foreign urls that we are going to allow
+        // to be rendered.
+        response.then((raw) => {return raw.json()})
+        .then((package) => {
+            package.hrefs.forEach((href) => {
+                foreign_hrefs.push(href);
+            });
+
+            console.log(`We added the following links: ${package.hrefs}`);
+        });
+
 
         reply(true);
     } else {
@@ -54,25 +53,18 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     return true;
 });
 
-let state_check_intv = setInterval(async (handler) => {
-    if (core.pk === null) {
-        // remains dormant until we get a pk assigned
-        return false;
+
+function extract_before_request(details) {
+    // we extract all we can from this event and add it to the
+    // object for later serialization. We will harvest most of 
+    // the informtion from this event.
+    if (JSON.stringify(details).includes(CHROME_EXTENSION_PREFIX)) {
+        return;
     }
-
-    // we have a pk, so we can begin job submition
-    for (let jobreq of sandbox_waiting) {
-        console.log(`Requesting that ${jobreq} be scanned!`);
-        let response = post(`${core.host}${core.pk}/request`, {
-            "url": jobreq,
-        });
-
-        response.then((raw) => {return raw.json()})
-        .then((data) => {
-            sandbox_inprog.push(data['jobpk']);
-            console.log(`\tThe job has been registered as: ${data['jobpk']}.`);
-        });
+    
+    if (!foreign_hrefs.includes(details.url)) {
+        // we alert the user that something fishy is going on...
     }
+}
 
-    sandbox_waiting = [];
-}, 2000)
+chrome.webRequest.onBeforeRequest.addListener(extract_before_request, {urls: ["<all_urls>"]}, ["requestBody"]);
