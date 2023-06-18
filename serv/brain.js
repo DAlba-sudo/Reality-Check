@@ -101,9 +101,6 @@ async function spawn_job_check(jobpk) {
     let response = post(`${core.hostname}/job/${jobpk}`);
     response
         .then((raw) => {return raw.json()})
-        .then((serialized_list) => {
-            return serialized_list[0];
-        })
         .then((data) => {
             console.log(`Received this serialized object: ${JSON.stringify(data)}`)
             if (!data['has_completed']) {
