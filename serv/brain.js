@@ -2,7 +2,7 @@
 let core = {
     // this points to the location of the server
     // set this to localhost for testing purposes.
-    hostname: "http://127.0.0.1:8000",
+    hostname: "http://recon-webserver.r204.net:8000",
 
     // the consumer primary key, used to access the pool of jobs that
     // this consumer has requested from the RS servers.

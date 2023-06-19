@@ -1,0 +1,109 @@
+body, html {
+    background-color: #161718;
+    min-width: 500px;
+}
+
+/* Paddings and Margins */
+.p-normal {
+    padding: 10px;
+}
+
+/* Displays */
+.d-inline-block {
+    display: inline-block;
+}
+
+/* Text Related Classes */
+.text-crimson {
+    color: rgb(255, 65, 103);
+}
+
+.text-white {
+    color: white;
+}
+
+.text-gray {
+    color: rgb(152, 152, 152) !important;
+}
+
+.muted {
+    color: white;
+
+}
+
+/* Adding some nice shaders */
+.shadow-crimson {
+    filter: drop-shadow(0 0 0 0.75rem crimson);
+}
+
+.error-nudge {
+    border-radius: 100%;
+    width: 10px;
+    height: 10px;
+    background-color: rgb(254, 69, 106);
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.green-nudge {
+    border-radius: 100%;
+    width: 10px;
+    height: 10px;
+    background-color: rgb(33, 212, 33);
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.hidden {
+    height: 0px;
+    width: 0px;
+    padding: 0px;
+    opacity: 0%;
+    margin: 0px;
+    visibility: hidden;
+    display: none;
+}
+
+/* Keyframes */
+.flash-error {
+    animation: 3s ease-in 0s infinite both error-flash;
+}
+
+.flash-green {
+    animation: 3s ease-in 0s infinite both green-flash;
+
+}
+
+@keyframes error-flash {
+    0% {
+        text-shadow: crimson 10px 10px 50px;
+        opacity: 100%;
+    }
+
+    50% {
+        text-shadow: none;
+        opacity: 25%;
+    }
+
+    100% {
+        text-shadow: crimson 10px 10px 50px;
+        opacity: 100%;
+    }
+}
+
+@keyframes green-flash {
+    0% {
+        text-shadow: rgb(45, 233, 35) 10px 10px 50px;
+        opacity: 100%;
+    }
+
+    50% {
+        text-shadow: none;
+        opacity: 25%;
+    }
+
+    100% {
+        text-shadow: rgb(45, 233, 35) 10px 10px 50px;
+        opacity: 100%;
+    }
+}

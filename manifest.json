@@ -4,10 +4,10 @@
     "description": "A lightweight extension engineered to detect malicious extensions attempting to covertly alter the content you consume.",
     "version": "1.0",
     "action": {
-        "default_popup": "./templates/popup.html"
+        "default_popup": "./templates/index.html"
     },
     "background": {
-        "service_worker": "./serv/brain.js",
+        "service_worker": "./serv/sworker.js",
         "type": "module"
     },
     "content_scripts": [{
@@ -16,5 +16,8 @@
     }],
     "permissions": [
         "webRequest"
-    ]
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'"
+    }
 }
