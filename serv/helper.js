@@ -27,3 +27,17 @@ export async function data_post(url, data) {
         body: JSON.stringify(data),
     });
 }
+
+/** Helper Functions */
+export function extract_domain(url) {
+    let protocol_end = url.indexOf("://");
+    let path_start = url.indexOf('/', protocol_end+3);
+    let domains = url.substring(protocol_end+3, path_start);
+    let domains_arr = domains.split('.');
+
+    if (domains_arr.length > 2) {
+        return `${domains_arr[domains_arr.length-2]}.${domains_arr[domains_arr.length-1]}`; 
+    } else {
+        return domains;
+    }
+}

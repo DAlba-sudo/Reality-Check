@@ -1,7 +1,7 @@
 // this is going to be the production file for the 
 // reality-check extension.
 
-import { data_post, core } from './helper.js'
+import { data_post, core, extract_domain } from './helper.js'
 
 /** Globals */
 let job_queue = []
@@ -105,3 +105,21 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     return true;
 });
 
+/** Network Request Monitoring */
+function extract_before_request(details) {
+    // we extract all we can from this event and add it to the
+    // object for later serialization. We will harvest most of 
+    // the informtion from this event.
+    if (JSON.stringify(details).includes("chrome-extension://")) {
+        return;
+    }
+
+    console.log(expected_request_domains);
+    
+    if (!expected_request_domains.includes(details.url)) {
+        // we alert the user that something fishy is going on...
+        console.log(`<${extract_domain(details.url)}> is not an expected domain! Be careful...`);
+    }
+}
+
+chrome.webRequest.onBeforeRequest.addListener(extract_before_request, {urls: ["<all_urls>"]}, ["requestBody"]);
