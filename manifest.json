@@ -15,9 +15,13 @@
         "js": ["./cs/wgetter.js"]
     }],
     "permissions": [
-        "webRequest"
+        "webRequest",
+        "notifications"
     ],
     "content_security_policy": {
         "extension_pages": "script-src 'self'"
-    }
+    },
+    "host_permissions": [
+      "*://*/*"
+    ]
 }

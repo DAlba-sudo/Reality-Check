@@ -59,14 +59,17 @@ async function job_check(jobpk) {
     let response = data_post(`${core.hostname}/job/${jobpk}`, request_data);
     let data = await response.then((raw) => {
         return raw.json();
-    })
+    });
 
     if (data['state'] != 'DN') {
         setTimeout(job_check(jobpk), 1400);
     } else {
+        console.log(`Job has completed: ${JSON.stringify(data)}`)
         for (let domain in data['result']) {
             expected_request_domains.push(domain);
         }
+
+        core.suppress_alerts = false;
     }
 
     return true;
@@ -79,11 +82,14 @@ function job_check_spawner() {
         for (let jobpk of job_queue) {
             job_check(jobpk);
         }
+
+        job_queue = [];
     }
 }
 
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
     if (message.action == "data-email") {
+        console.log("We are registering with the server...");
         register_consumer(message.email).then((token) => {
             core.consumer_token = token;
             reply(token);
@@ -92,6 +98,8 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     
     if (message.action == "init-url" && core.consumer_token != null) {
         console.log("Registering job: " + message.hostname);
+        expected_request_domains.push(extract_domain(message.hostname));
+
         register_job(message.hostname).then((jobpk) => {
             // this should populate our job check queue with the 
             // jobpk (for the eventual interval).
@@ -110,15 +118,25 @@ function extract_before_request(details) {
     // we extract all we can from this event and add it to the
     // object for later serialization. We will harvest most of 
     // the informtion from this event.
-    if (JSON.stringify(details).includes("chrome-extension://")) {
+    if (details.initiator.includes('chrome-extension')) {
+        return;
+    } else if (details.initiator.includes('r204.net')) {
+        return;
+    } else if (details.initiator.includes('recon-webserver')) {
         return;
     }
-
-    console.log(expected_request_domains);
     
-    if (!expected_request_domains.includes(details.url)) {
+    if (!expected_request_domains.includes(details.url) && !core.suppress_alerts) {
         // we alert the user that something fishy is going on...
-        console.log(`<${extract_domain(details.url)}> is not an expected domain! Be careful...`);
+        chrome.notifications.create(
+            {
+                message: `Request to: ${details.url} was not observed when we loading this page! Tread carefully...`,
+                iconUrl: "https://static.vecteezy.com/system/resources/previews/014/633/421/original/colorful-pencil-logo-icon-favicon-design-free-vector.jpg",
+                title: "Reality-Check: Potentially Malicious Outoing Request",
+                type: "basic"
+            }
+        );
+        console.log(`<${extract_domain(details.url)}>[from: ${details.initiator}] is not an expected domain! Be careful...: ${expected_request_domains}`);
     }
 }
 

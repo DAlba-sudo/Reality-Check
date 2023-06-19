@@ -1,5 +1,5 @@
-let url = window.location.href;
-let hostname = window.location.hostname;
+let url_ = window.location.href;
+let hostname = window.location.href;
 let hrefs = [];
 
 function is_foreign(url) {
@@ -23,7 +23,7 @@ function is_foreign(url) {
     }
 }
 
-chrome.runtime.sendMessage({action: 'init-url', hostname: window.location.href}, undefined, (result) => {
+chrome.runtime.sendMessage({action: 'init-url', hostname: url_}, undefined, (result) => {
     if (result) {
         console.log("The urls has been stored, awaiting response from service worker.");
     }

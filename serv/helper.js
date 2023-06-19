@@ -6,8 +6,9 @@ let debug_hostname = "http://127.0.0.1:8000";
 let recon_hostname = "http://recon-webserver:8000";
 
 export let core = {
-    hostname: debug_hostname,
+    hostname: recon_hostname,
     consumer_token: null,
+    suppress_alerts: true,
 }
 
 /**
